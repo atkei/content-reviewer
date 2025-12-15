@@ -35,7 +35,9 @@ describe('AISdkClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default success mock
-    mockGenerateObject.mockResolvedValue({ object: { issues: [], summary: 'test' } });
+    mockGenerateObject.mockResolvedValue({
+      object: { issues: [], summary: 'test' },
+    });
     mockOpenAI.mockReturnValue({}); // Mock model instance
   });
 

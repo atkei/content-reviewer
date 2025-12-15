@@ -13,7 +13,9 @@ describe('prompts', () => {
 
     it('should use custom instruction when provided', () => {
       const customInstruction = '# Custom Instruction\n- Check for typos.';
-      const systemPrompt = prompts.buildSystemPrompt({ instruction: customInstruction });
+      const systemPrompt = prompts.buildSystemPrompt({
+        instruction: customInstruction,
+      });
 
       expect(systemPrompt).toContain(customInstruction);
       expect(systemPrompt).not.toContain(DEFAULT_INSTRUCTION_JA);
@@ -30,7 +32,9 @@ describe('prompts', () => {
 
     it('should use custom instruction when provided', () => {
       const customInstruction = '# Custom Instruction\n- Check for typos.';
-      const systemPrompt = prompts.buildSystemPrompt({ instruction: customInstruction });
+      const systemPrompt = prompts.buildSystemPrompt({
+        instruction: customInstruction,
+      });
 
       expect(systemPrompt).toContain(customInstruction);
       expect(systemPrompt).not.toContain(DEFAULT_INSTRUCTION_EN);
