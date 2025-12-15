@@ -1,0 +1,111 @@
+# @content-reviewer/cli
+
+CLI tool for reviewing written content using LLMs.
+
+## Installation
+
+### Global Installation (Recommended)
+
+```bash
+npm install -g @content-reviewer/cli
+```
+
+### Using npx (No Installation Required)
+
+```bash
+npx @content-reviewer/cli article.md
+```
+
+## Quick Start
+
+### 1. Set up your API key
+
+Set environment variables in your shell:
+
+```bash
+# For OpenAI (default)
+export OPENAI_API_KEY="sk-..."
+
+# For Anthropic Claude
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# For Google
+export GOOGLE_API_KEY="..."
+```
+
+Alternatively, pass the API key directly using the `--api-key` option:
+
+```bash
+content-review article.md --api-key "sk-..."
+```
+
+### 2. Review your content
+
+```bash
+content-review article.md
+```
+
+## Usage
+
+```bash
+content-review -h
+```
+
+### Examples
+
+```bash
+# Review in Japanese
+content-review article.md --language ja
+
+# Use Anthropic Claude
+content-review article.md --provider anthropic --model claude-sonnet-4-5
+
+# Use custom configuration
+content-review article.md -c .reviewrc.json
+
+# Save results to JSON file
+content-review article.md -o review-results.json
+```
+
+## Configuration
+
+Create a `.reviewrc.json` file in your project root:
+
+```json
+{
+  "language": "en",
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini"
+  }
+}
+```
+
+### Custom Instruction (Persona & Guidelines)
+
+You can use a text file (such as a Markdown file) for review instructions, defining the reviewer's persona and specific guidelines:
+
+```bash
+content-review article.md --instruction ./my-instruction.md
+```
+
+Or via config file:
+
+```json
+{
+  "instructionFile": "./my-instruction.md",
+  "language": "en"
+}
+```
+
+Example instruction file:
+
+```markdown
+You are a strict technical editor.
+Please review the following text for technical accuracy and clarity.
+
+# Review Guidelines
+
+- Ensure all code examples are correct.
+- Check for passive voice usage.
+```

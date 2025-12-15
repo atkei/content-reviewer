@@ -1,0 +1,58 @@
+{
+  "name": "@content-reviewer/cli",
+  "version": "0.0.1",
+  "description": "CLI tool for reviewing written content using LLMs",
+  "bin": {
+    "content-review": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs --dts --clean",
+    "dev": "tsup src/index.ts --format cjs --dts --watch",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "markdown",
+    "proofreading",
+    "content-review",
+    "cli"
+  ],
+  "author": "atkei",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atkei/content-reviewer.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/atkei/content-reviewer#readme",
+  "bugs": {
+    "url": "https://github.com/atkei/content-reviewer/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@content-reviewer/core": "workspace:*",
+    "commander": "^14.0.2",
+    "consola": "^3.4.2",
+    "cosmiconfig": "^9.0.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
+  }
+}

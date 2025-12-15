@@ -1,0 +1,70 @@
+{
+  "name": "@content-reviewer/core",
+  "version": "0.0.1",
+  "description": "Library for reviewing written content using LLMs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --tsconfig tsconfig.build.json",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --tsconfig tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "markdown",
+    "proofreading",
+    "content-review"
+  ],
+  "author": "atkei",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atkei/content-reviewer.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/atkei/content-reviewer#readme",
+  "bugs": {
+    "url": "https://github.com/atkei/content-reviewer/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.44",
+    "@ai-sdk/google": "^2.0.33",
+    "@ai-sdk/openai": "^2.0.67",
+    "ai": "^5.0.93",
+    "axios": "^1.13.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
+  }
+}
