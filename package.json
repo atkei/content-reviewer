@@ -25,7 +25,7 @@
     "clean": "pnpm -r clean && rm -rf node_modules",
     "review": "node packages/cli/dist/index.js",
     "changeset": "changeset",
-    "release": "pnpm build && pnpm -r publish --access public"
+    "release": "pnpm changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
