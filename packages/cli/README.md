@@ -4,13 +4,13 @@ CLI tool for reviewing written content using LLMs.
 
 ## Installation
 
-### Global Installation (Recommended)
+### Global Installation
 
 ```bash
 npm install -g @content-reviewer/cli
 ```
 
-### Using npx (No Installation Required)
+### Using npx
 
 ```bash
 npx @content-reviewer/cli article.md
@@ -102,7 +102,7 @@ Example instruction file:
 
 ```markdown
 You are a strict technical editor.
-Please review the following text for technical accuracy and clarity.
+Please review the provided text for technical accuracy and clarity.
 
 # Review Guidelines
 
