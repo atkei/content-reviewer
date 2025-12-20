@@ -1,6 +1,6 @@
 {
   "name": "@content-reviewer/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CLI tool for reviewing written content using LLMs",
   "bin": {
     "content-review": "./dist/index.js"
