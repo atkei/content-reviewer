@@ -2,6 +2,7 @@ import type { Document, ReviewConfig, ReviewResult } from './types.js';
 import { createLLMClient } from './llm/index.js';
 import { resolveApiKey } from './config.js';
 import { getLanguagePrompts } from './prompts.js';
+import { filterIssuesBySeverity } from './filter.js';
 
 export class ContentReviewer {
   constructor(private readonly config: ReviewConfig) {}
@@ -9,11 +10,15 @@ export class ContentReviewer {
   async review(document: Document): Promise<ReviewResult> {
     const llmResult = await this.runLLMReview(document);
 
-    const summary = llmResult.summary || this.generateSummary(llmResult.issues);
+    const filteredIssues = this.config.severityLevel
+      ? filterIssuesBySeverity(llmResult.issues, this.config.severityLevel)
+      : llmResult.issues;
+
+    const summary = llmResult.summary || this.generateSummary(filteredIssues);
 
     return {
       source: document.source,
-      issues: llmResult.issues,
+      issues: filteredIssues,
       summary,
       reviewedAt: new Date(),
     };

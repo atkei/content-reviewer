@@ -16,6 +16,7 @@ program
   .option(CLI_OPTIONS.INSTRUCTION.flag, getOptionDescription(CLI_OPTIONS.INSTRUCTION))
   .option(CLI_OPTIONS.OUTPUT.flag, getOptionDescription(CLI_OPTIONS.OUTPUT))
   .option(CLI_OPTIONS.LANGUAGE.flag, getOptionDescription(CLI_OPTIONS.LANGUAGE))
+  .option(CLI_OPTIONS.SEVERITY_LEVEL.flag, getOptionDescription(CLI_OPTIONS.SEVERITY_LEVEL))
   .option(CLI_OPTIONS.PROVIDER.flag, getOptionDescription(CLI_OPTIONS.PROVIDER))
   .option(CLI_OPTIONS.MODEL.flag, getOptionDescription(CLI_OPTIONS.MODEL))
   .option(CLI_OPTIONS.API_KEY.flag, getOptionDescription(CLI_OPTIONS.API_KEY))
