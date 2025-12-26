@@ -1,4 +1,4 @@
-import type { ReviewConfig, Language, LLMConfig, LLMProvider } from './types.js';
+import type { ReviewConfig, Language, LLMConfig, LLMProvider, IssueSeverity } from './types.js';
 import { ENV_VARS } from './constants.js';
 import { MissingApiKeyError } from './errors.js';
 
@@ -6,6 +6,7 @@ export type ReviewConfigInput = Readonly<{
   instruction?: string;
   language?: Language;
   llm?: Partial<LLMConfig>;
+  severityLevel?: IssueSeverity;
 }>;
 
 export const PROVIDER_DEFAULT_MODELS: Record<LLMProvider, string> = {
@@ -36,6 +37,7 @@ export function createReviewConfig(input: ReviewConfigInput = {}): ReviewConfig 
       model,
       apiKey: input.llm?.apiKey,
     },
+    severityLevel: input.severityLevel,
   };
 }
 

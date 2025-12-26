@@ -6,10 +6,12 @@ import {
   validateConfig,
   type Language,
   type LLMProvider,
+  type IssueSeverity,
 } from '@content-reviewer/core';
 import { consola } from 'consola';
 import type { UserConfigFile } from './types.js';
 import { CONFIG_MODULE_NAME } from './constants.js';
+import { CLI_OPTIONS } from './options.js';
 
 export async function loadConfiguration(
   options: Record<string, unknown>
@@ -69,6 +71,9 @@ export async function loadConfiguration(
     }
   }
 
+  const severityLevel =
+    (options.severityLevel as IssueSeverity | undefined) ?? fileConfig.severityLevel;
+
   const config = createReviewConfig({
     ...fileConfig,
     instruction: instructionContent,
@@ -79,6 +84,8 @@ export async function loadConfiguration(
       apiKey: (options.apiKey as string | undefined) ?? fileConfig.llm?.apiKey,
       model: (options.model as string | undefined) ?? fileConfig.llm?.model,
     },
+    severityLevel:
+      severityLevel === CLI_OPTIONS.SEVERITY_LEVEL.defaultValue ? undefined : severityLevel,
   });
 
   validateConfig(config);

@@ -23,6 +23,7 @@ export type ReviewConfig = Readonly<{
   instruction?: string;
   language: Language;
   llm: LLMConfig;
+  severityLevel?: IssueSeverity;
 }>;
 
 export type IssueSeverity = 'error' | 'warning' | 'suggestion';

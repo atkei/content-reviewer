@@ -3,6 +3,8 @@ import {
   DEFAULT_LLM_CONFIG,
   PROVIDER_DEFAULT_MODELS,
   ENV_VARS,
+  SEVERITY_LEVELS,
+  DEFAULT_SEVERITY_LEVEL,
 } from '@content-reviewer/core';
 
 export interface CliOptionDefinition {
@@ -29,6 +31,11 @@ export const CLI_OPTIONS = {
     flag: '-l, --language <lang>',
     description: 'review language (ja, en)',
     defaultValue: DEFAULT_CONFIG.language,
+  },
+  SEVERITY_LEVEL: {
+    flag: '-s, --severity-level <level>',
+    description: `minimum severity level to display (${Object.keys(SEVERITY_LEVELS).join(', ')})`,
+    defaultValue: DEFAULT_SEVERITY_LEVEL,
   },
   API_KEY: {
     flag: '--api-key <key>',
