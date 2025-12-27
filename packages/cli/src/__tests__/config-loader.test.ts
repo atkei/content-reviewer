@@ -67,4 +67,127 @@ describe('loadConfiguration', () => {
 
     delete process.env.OPENAI_API_KEY;
   });
+
+  it('should handle severityLevel from CLI options', async () => {
+    mockSearch.mockResolvedValue(null);
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({
+      severityLevel: 'error',
+    });
+
+    expect(config.severityLevel).toBe('error');
+
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('should handle severityLevel from config file', async () => {
+    mockSearch.mockResolvedValue({
+      config: {
+        severityLevel: 'warning',
+      },
+      filepath: '/path/to/config',
+    });
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({});
+
+    expect(config.severityLevel).toBe('warning');
+
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('should prioritize CLI severityLevel over file config', async () => {
+    mockSearch.mockResolvedValue({
+      config: {
+        severityLevel: 'suggestion',
+      },
+      filepath: '/path/to/config',
+    });
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({
+      severityLevel: 'error',
+    });
+
+    expect(config.severityLevel).toBe('error');
+
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('should set severityLevel to undefined when default value is passed', async () => {
+    mockSearch.mockResolvedValue(null);
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({
+      severityLevel: 'suggestion', // default value
+    });
+
+    expect(config.severityLevel).toBeUndefined();
+
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('should handle all severityLevel values', async () => {
+    mockSearch.mockResolvedValue(null);
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const severities: Array<'error' | 'warning' | 'suggestion'> = ['error', 'warning', 'suggestion'];
+
+    for (const severity of severities) {
+      const config = await loadConfiguration({
+        severityLevel: severity,
+      });
+
+      if (severity === 'suggestion') {
+        expect(config.severityLevel).toBeUndefined();
+      } else {
+        expect(config.severityLevel).toBe(severity);
+      }
+    }
+
+    delete process.env.OPENAI_API_KEY;
+  });
+
+  it('should merge severityLevel with other config options', async () => {
+    mockSearch.mockResolvedValue({
+      config: {
+        language: 'ja',
+        severityLevel: 'warning',
+      },
+      filepath: '/path/to/config',
+    });
+    process.env.ANTHROPIC_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({
+      provider: 'anthropic',
+      severityLevel: 'error',
+    });
+
+    expect(config.language).toBe('ja');
+    expect(config.llm.provider).toBe('anthropic');
+    expect(config.severityLevel).toBe('error');
+
+    delete process.env.ANTHROPIC_API_KEY;
+  });
+
+  it('should load config file from explicit path with severityLevel', async () => {
+    mockLoad.mockResolvedValue({
+      config: {
+        language: 'en',
+        severityLevel: 'error',
+      },
+      filepath: '/explicit/path/config.js',
+    });
+    process.env.OPENAI_API_KEY = 'test-key';
+
+    const config = await loadConfiguration({
+      config: '/explicit/path/config.js',
+    });
+
+    expect(config.severityLevel).toBe('error');
+    expect(mockLoad).toHaveBeenCalled();
+
+    delete process.env.OPENAI_API_KEY;
+  });
 });
