@@ -84,4 +84,104 @@ describe('ContentReviewer (Integration)', () => {
     const issuesWithLineNumbers = result.issues.filter((i) => i.lineNumber !== undefined);
     expect(issuesWithLineNumbers.length).toBeGreaterThan(0);
   });
+
+  it('should filter issues by severityLevel when configured', async () => {
+    // Mock to return multiple severity levels
+    vi.mock('../../llm/index.js', () => ({
+      createLLMClient: () => ({
+        generateReview: vi.fn().mockResolvedValue({
+          issues: [
+            { severity: 'error', message: 'Critical error', matchText: 'error text' },
+            { severity: 'warning', message: 'Warning message', matchText: 'warning text' },
+            { severity: 'suggestion', message: 'Suggestion message', matchText: 'suggestion text' },
+          ],
+          summary: 'Mixed severity issues found.',
+        }),
+      }),
+    }));
+
+    const config: ReviewConfig = {
+      language: 'en',
+      llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      severityLevel: 'warning',
+    };
+
+    const reviewer = new ContentReviewer(config);
+    const result = await reviewer.review(mockDocument);
+
+    // Should only include warning and error
+    expect(result.issues).toHaveLength(2);
+    expect(result.issues.some((i) => i.severity === 'suggestion')).toBe(false);
+    expect(result.issues.some((i) => i.severity === 'warning')).toBe(true);
+    expect(result.issues.some((i) => i.severity === 'error')).toBe(true);
+  });
+
+  it('should not filter issues when severityLevel is undefined', async () => {
+    const config: ReviewConfig = {
+      language: 'en',
+      llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      // severityLevel not set
+    };
+
+    const reviewer = new ContentReviewer(config);
+    const result = await reviewer.review(mockDocument);
+
+    // Should include all issues from mock
+    expect(result.issues.length).toBeGreaterThan(0);
+  });
+
+  it('should generate summary based on filtered issues', async () => {
+    vi.mock('../../llm/index.js', () => ({
+      createLLMClient: () => ({
+        generateReview: vi.fn().mockResolvedValue({
+          issues: [
+            { severity: 'error', message: 'Error 1' },
+            { severity: 'error', message: 'Error 2' },
+            { severity: 'suggestion', message: 'Suggestion 1' },
+          ],
+          summary: undefined, // Force local summary generation
+        }),
+      }),
+    }));
+
+    const config: ReviewConfig = {
+      language: 'en',
+      llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      severityLevel: 'error',
+    };
+
+    const reviewer = new ContentReviewer(config);
+    const result = await reviewer.review(mockDocument);
+
+    // Summary should reflect only filtered issues (2 errors)
+    expect(result.issues).toHaveLength(2);
+    expect(result.summary).toBeDefined();
+    expect(result.summary.length).toBeGreaterThan(0);
+  });
+
+  it('should handle severityLevel error filtering', async () => {
+    vi.mock('../../llm/index.js', () => ({
+      createLLMClient: () => ({
+        generateReview: vi.fn().mockResolvedValue({
+          issues: [
+            { severity: 'error', message: 'Error only' },
+            { severity: 'warning', message: 'Should be filtered' },
+          ],
+          summary: 'Test summary',
+        }),
+      }),
+    }));
+
+    const config: ReviewConfig = {
+      language: 'ja',
+      llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      severityLevel: 'error',
+    };
+
+    const reviewer = new ContentReviewer(config);
+    const result = await reviewer.review(mockDocument);
+
+    expect(result.issues).toHaveLength(1);
+    expect(result.issues[0].severity).toBe('error');
+  });
 });
