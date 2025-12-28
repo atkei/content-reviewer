@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { handleReviewAction } from './commands/review.js';
 import { PROGRAM_NAME, PROGRAM_DESCRIPTION, PROGRAM_VERSION } from './constants.js';
+import { SEVERITY_LEVELS } from '@content-reviewer/core';
 
 import { CLI_OPTIONS, getOptionDescription } from './options.js';
 
@@ -10,12 +11,20 @@ const program = new Command();
 
 program.name(PROGRAM_NAME).description(PROGRAM_DESCRIPTION).version(PROGRAM_VERSION);
 
+const severityLevelOption = new Option(
+  CLI_OPTIONS.SEVERITY_LEVEL.flag,
+  getOptionDescription(CLI_OPTIONS.SEVERITY_LEVEL)
+)
+  .choices(Object.keys(SEVERITY_LEVELS))
+  .default(CLI_OPTIONS.SEVERITY_LEVEL.defaultValue);
+
 program
   .argument('<file>', 'File to review')
   .option(CLI_OPTIONS.CONFIG.flag, getOptionDescription(CLI_OPTIONS.CONFIG))
   .option(CLI_OPTIONS.INSTRUCTION.flag, getOptionDescription(CLI_OPTIONS.INSTRUCTION))
   .option(CLI_OPTIONS.OUTPUT.flag, getOptionDescription(CLI_OPTIONS.OUTPUT))
   .option(CLI_OPTIONS.LANGUAGE.flag, getOptionDescription(CLI_OPTIONS.LANGUAGE))
+  .addOption(severityLevelOption)
   .option(CLI_OPTIONS.PROVIDER.flag, getOptionDescription(CLI_OPTIONS.PROVIDER))
   .option(CLI_OPTIONS.MODEL.flag, getOptionDescription(CLI_OPTIONS.MODEL))
   .option(CLI_OPTIONS.API_KEY.flag, getOptionDescription(CLI_OPTIONS.API_KEY))

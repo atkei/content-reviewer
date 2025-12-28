@@ -1,26 +1,50 @@
-import { Language } from './types.js';
+import type { IssueSeverity, Language } from './types.js';
 import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from './default-instructions.js';
+import { SEVERITY_LEVELS } from './filter.js';
 
 export type SystemPromptOptions = Readonly<{
   instruction?: string;
+  severityLevel?: IssueSeverity;
 }>;
 
+function getIncludedLevels(minLevel: IssueSeverity): IssueSeverity[] {
+  const minValue = SEVERITY_LEVELS[minLevel];
+  return (Object.keys(SEVERITY_LEVELS) as IssueSeverity[])
+    .filter((level) => SEVERITY_LEVELS[level] >= minValue)
+    .sort((a, b) => SEVERITY_LEVELS[b] - SEVERITY_LEVELS[a]);
+}
+
+function buildSummaryInstruction(minLevel: IssueSeverity, language: Language): string {
+  const includedLevels = getIncludedLevels(minLevel);
+  const formatLevels = (levels: IssueSeverity[]): string => levels.map((l) => `"${l}"`).join(', ');
+
+  if (language === 'ja') {
+    return `
+重要: 問題点(issues)は全て適切なseverityで報告してください。
+ただし、総評(summary)は ${formatLevels(includedLevels)} の問題のみに基づいて記述してください。
+`;
+  }
+
+  return `
+Important: Report all issues with their appropriate severity levels.
+However, the summary should only reference issues with severity ${formatLevels(includedLevels)}.
+`;
+}
+
 type LanguagePrompts = Readonly<{
-  generateSummary: (errorCount: number, warningCount: number) => string;
   buildSystemPrompt: (options: SystemPromptOptions) => string;
   buildUserPrompt: () => string;
 }>;
 
 const allPrompts: Record<Language, LanguagePrompts> = {
   ja: {
-    generateSummary: (errorCount, warningCount) =>
-      `レビュー完了。エラー${errorCount}件、警告${warningCount}件を検出。`,
-    buildSystemPrompt: ({ instruction }) => {
+    buildSystemPrompt: ({ instruction, severityLevel }) => {
       const instructions = instruction || DEFAULT_INSTRUCTION_JA;
+      const summaryInstruction = severityLevel ? buildSummaryInstruction(severityLevel, 'ja') : '';
 
       return (
         `${instructions}` +
-        `
+        `${summaryInstruction}
 レビュー結果は日本語で、以下のJSON構造で返してください：
 - issues: 見つかった問題点の配列
   - severity: 深刻度
@@ -41,14 +65,13 @@ const allPrompts: Record<Language, LanguagePrompts> = {
     buildUserPrompt: () => '以下の記事をレビューしてください：\n\n---\n',
   },
   en: {
-    generateSummary: (errorCount, warningCount) =>
-      `Review completed. Found ${errorCount} errors and ${warningCount} warnings.`,
-    buildSystemPrompt: ({ instruction }) => {
+    buildSystemPrompt: ({ instruction, severityLevel }) => {
       const instructions = instruction || DEFAULT_INSTRUCTION_EN;
+      const summaryInstruction = severityLevel ? buildSummaryInstruction(severityLevel, 'en') : '';
 
       return (
         `${instructions}` +
-        `
+        `${summaryInstruction}
 Provide the review results in English with the following JSON structure:
 - issues: Array of found issues
   - severity: Severity level
