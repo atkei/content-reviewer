@@ -10,16 +10,14 @@ export class ContentReviewer {
   async review(document: Document): Promise<ReviewResult> {
     const llmResult = await this.runLLMReview(document);
 
-    const filteredIssues = this.config.severityLevel
+    const issues = this.config.severityLevel
       ? filterIssuesBySeverity(llmResult.issues, this.config.severityLevel)
       : llmResult.issues;
 
-    const summary = llmResult.summary || this.generateSummary(filteredIssues);
-
     return {
       source: document.source,
-      issues: filteredIssues,
-      summary,
+      issues,
+      summary: llmResult.summary,
       reviewedAt: new Date(),
     };
   }
@@ -46,19 +44,11 @@ export class ContentReviewer {
     };
   }
 
-  private generateSummary(issues: import('./types.js').ReviewIssue[]): string {
-    const errorCount = issues.filter((i) => i.severity === 'error').length;
-    const warningCount = issues.filter((i) => i.severity === 'warning').length;
-
-    const { generateSummary } = getLanguagePrompts(this.config.language);
-    return generateSummary(errorCount, warningCount);
-  }
-
   private buildSystemPrompt(): string {
-    const { instruction, language } = this.config;
+    const { instruction, language, severityLevel } = this.config;
 
     const { buildSystemPrompt } = getLanguagePrompts(language);
-    return buildSystemPrompt({ instruction });
+    return buildSystemPrompt({ instruction, severityLevel });
   }
 
   private buildUserPrompt(document: Document): string {

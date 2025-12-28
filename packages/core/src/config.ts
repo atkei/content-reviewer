@@ -1,6 +1,7 @@
 import type { ReviewConfig, Language, LLMConfig, LLMProvider, IssueSeverity } from './types.js';
 import { ENV_VARS } from './constants.js';
 import { MissingApiKeyError } from './errors.js';
+import { SEVERITY_LEVELS } from './filter.js';
 
 export type ReviewConfigInput = Readonly<{
   instruction?: string;
@@ -80,5 +81,12 @@ export function validateConfig(config: ReviewConfig): void {
 
   if (!config.llm.model) {
     throw new Error('LLM model is required');
+  }
+
+  if (config.severityLevel !== undefined && !(config.severityLevel in SEVERITY_LEVELS)) {
+    const validLevels = Object.keys(SEVERITY_LEVELS).join(', ');
+    throw new Error(
+      `Invalid severity level: ${config.severityLevel}. Valid levels are: ${validLevels}`
+    );
   }
 }
