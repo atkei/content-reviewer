@@ -39,8 +39,10 @@ type LanguagePrompts = Readonly<{
 const allPrompts: Record<Language, LanguagePrompts> = {
   ja: {
     buildSystemPrompt: ({ instruction, severityLevel }) => {
-      const instructions = instruction || DEFAULT_INSTRUCTION_JA;
-      const summaryInstruction = severityLevel ? buildSummaryInstruction(severityLevel, 'ja') : '';
+      const instructions = (instruction || DEFAULT_INSTRUCTION_JA).trimEnd() + '\n';
+      const summaryInstruction = severityLevel
+        ? buildSummaryInstruction(severityLevel, 'ja').trim() + '\n'
+        : '';
 
       return (
         `${instructions}` +
@@ -57,17 +59,20 @@ const allPrompts: Record<Language, LanguagePrompts> = {
 - summary: 全体的な総評（2-3文程度）
 
 注意：
+- 有効なJSONのみを返してください（前後に文章やMarkdownのコードブロック等を付けないでください）。
 - lineNumberは不要です。matchTextのみを提供してください。
 - 建設的で具体的なフィードバックを提供してください。
 `
       );
     },
-    buildUserPrompt: () => '以下の記事をレビューしてください：\n\n---\n',
+    buildUserPrompt: () => '以下のテキストをレビューしてください：\n\n\n',
   },
   en: {
     buildSystemPrompt: ({ instruction, severityLevel }) => {
-      const instructions = instruction || DEFAULT_INSTRUCTION_EN;
-      const summaryInstruction = severityLevel ? buildSummaryInstruction(severityLevel, 'en') : '';
+      const instructions = (instruction || DEFAULT_INSTRUCTION_EN).trimEnd() + '\n';
+      const summaryInstruction = severityLevel
+        ? buildSummaryInstruction(severityLevel, 'en').trim() + '\n'
+        : '';
 
       return (
         `${instructions}` +
@@ -84,12 +89,13 @@ Provide the review results in English with the following JSON structure:
 - summary: Overall assessment (2-3 sentences)
 
 Note:
+- Return valid JSON only (do not wrap in markdown code fences or add extra text).
 - Do not provide lineNumber. Only provide matchText.
 - Provide constructive and specific feedback.
 `
       );
     },
-    buildUserPrompt: () => 'Please review the following article:\n\n---\n',
+    buildUserPrompt: () => 'Please review the following text:\n\n\n',
   },
 };
 

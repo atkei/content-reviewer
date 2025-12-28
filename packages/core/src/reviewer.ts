@@ -28,7 +28,6 @@ export class ContentReviewer {
 
     const systemPrompt = this.buildSystemPrompt();
     const userPrompt = this.buildUserPrompt(document);
-
     const reviewData = await llmClient.generateReview(systemPrompt, userPrompt);
 
     const issues = reviewData.issues.map((issue) => ({
@@ -57,7 +56,7 @@ export class ContentReviewer {
     const { buildUserPrompt } = getLanguagePrompts(language);
     const prompt = buildUserPrompt();
 
-    return prompt + document.rawContent + '\n---';
+    return prompt + document.rawContent;
   }
 
   private findFirstMatchingLineNumber(rawContent: string, matchText: string): number | undefined {
