@@ -1,13 +1,13 @@
 # Content Reviewer
 
-An LLM-powered tool for automated content review. Define custom instructions to ensure consistent review standards across all your content.
+An LLM-powered tool for reviewing written content. By default, it’s optimized for technical writing (e.g., blog posts, docs, guides), and you can customize it with instructions for any style or domain.
 
 ## Features
 
-- Custom instructions for consistent review criteria
+- Sensible defaults out of the box
+- Custom instructions for consistent, team-specific review criteria
+- Structured output with severity levels (error, warning, suggestion)
 - Multiple LLM providers (OpenAI, Anthropic, Google)
-- Multilingual support
-- CLI tool and library for programmatic use
 
 ## Quick Start
 
@@ -49,6 +49,10 @@ See [Core Documentation](./packages/core) for API reference.
 | ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | [@content-reviewer/cli](./packages/cli)   | Command-line interface for content review | [![npm](https://img.shields.io/npm/v/@content-reviewer/cli)](https://www.npmjs.com/package/@content-reviewer/cli)   |
 | [@content-reviewer/core](./packages/core) | Core library for programmatic integration | [![npm](https://img.shields.io/npm/v/@content-reviewer/core)](https://www.npmjs.com/package/@content-reviewer/core) |
+
+## GitHub Actions
+
+Review docs in Pull Requests with [Content Reviewer Action](https://github.com/atkei/content-reviewer-action).
 
 ## Prerequisites
 
