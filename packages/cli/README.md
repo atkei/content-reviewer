@@ -1,6 +1,6 @@
 # @content-reviewer/cli
 
-CLI tool for reviewing written content using LLMs.
+An LLM-powered CLI for reviewing written content.
 
 ## Installation
 
@@ -18,7 +18,7 @@ npx @content-reviewer/cli article.md
 
 ## Quick Start
 
-### 1. Set up your API key
+### 1. Set up an API key
 
 Set environment variables in your shell:
 
@@ -83,7 +83,7 @@ Create a `.reviewrc.json` file in your project root:
 
 ### Custom Instruction (Persona & Guidelines)
 
-You can use a text file (such as a Markdown file) for review instructions, defining the reviewer's persona and specific guidelines:
+You can provide an instruction file (e.g., Markdown) to define the reviewer's persona and guidelines:
 
 ```bash
 content-review article.md --instruction ./my-instruction.md

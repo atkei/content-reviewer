@@ -1,6 +1,6 @@
 # @content-reviewer/core
 
-Library for reviewing written content using LLMs.
+An LLM-powered library for reviewing written content.
 
 ## Installation
 
@@ -11,8 +11,7 @@ npm install @content-reviewer/core
 ## Usage
 
 ```typescript
-import { ContentReviewer, createReviewConfig } from '@content-reviewer/core';
-import type { Document } from '@content-reviewer/core';
+import { ContentReviewer, createReviewConfig, type Document } from '@content-reviewer/core';
 
 // 1. Configuration
 const config = createReviewConfig({
@@ -74,7 +73,7 @@ The outcome of a review.
 - `issues`: Array of `ReviewIssue` objects.
 - `summary`: AI-generated summary of the review.
 
-## Custom Instruction
+## Custom Instructions
 
 Instructions (including persona and guidelines) can be provided as a string.
 
