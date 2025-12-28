@@ -8,8 +8,6 @@ An LLM-powered tool for reviewing written content. By default, it’s optimized 
 - Custom instructions for consistent, team-specific review criteria
 - Structured output with severity levels (error, warning, suggestion)
 - Multiple LLM providers (OpenAI, Anthropic, Google)
-- English and Japanese support
-- CLI tool and core library for programmatic use
 
 ## Quick Start
 
