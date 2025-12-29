@@ -15,8 +15,7 @@ const allPrompts: Record<Language, LanguagePrompts> = {
     buildSystemPrompt: ({ instruction }) => {
       const instructions = (instruction || DEFAULT_INSTRUCTION_JA).trimEnd() + '\n';
 
-      return (
-        `${instructions}
+      return `${instructions}
 レビュー結果は日本語で、以下のJSON構造で返してください：
 - issues: 見つかった問題点の配列
   - severity: 深刻度
@@ -31,8 +30,7 @@ const allPrompts: Record<Language, LanguagePrompts> = {
 - 有効なJSONのみを返してください（前後に文章やMarkdownのコードブロック等を付けないでください）。
 - lineNumberは不要です。matchTextのみを提供してください。
 - 建設的で具体的なフィードバックを提供してください。
-`
-      );
+`;
     },
     buildUserPrompt: () => '以下のテキストをレビューしてください：\n\n\n',
   },
@@ -40,8 +38,7 @@ const allPrompts: Record<Language, LanguagePrompts> = {
     buildSystemPrompt: ({ instruction }) => {
       const instructions = (instruction || DEFAULT_INSTRUCTION_EN).trimEnd() + '\n';
 
-      return (
-        `${instructions}
+      return `${instructions}
 Provide the review results in English with the following JSON structure:
 - issues: Array of found issues
   - severity: Severity level
@@ -56,8 +53,7 @@ Note:
 - Return valid JSON only (do not wrap in markdown code fences or add extra text).
 - Do not provide lineNumber. Only provide matchText.
 - Provide constructive and specific feedback.
-`
-      );
+`;
     },
     buildUserPrompt: () => 'Please review the following text:\n\n\n',
   },

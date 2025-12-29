@@ -1,6 +1,6 @@
 ---
-"@content-reviewer/core": patch
-"@content-reviewer/cli": patch
+'@content-reviewer/core': patch
+'@content-reviewer/cli': patch
 ---
 
 Remove summary field from ReviewResult
