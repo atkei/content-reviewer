@@ -17,7 +17,6 @@ export class ContentReviewer {
     return {
       source: document.source,
       issues,
-      summary: llmResult.summary,
       reviewedAt: new Date(),
     };
   }
@@ -37,17 +36,14 @@ export class ContentReviewer {
         : undefined,
     }));
 
-    return {
-      issues,
-      summary: reviewData.summary,
-    };
+    return { issues };
   }
 
   private buildSystemPrompt(): string {
-    const { instruction, language, severityLevel } = this.config;
+    const { instruction, language } = this.config;
 
     const { buildSystemPrompt } = getLanguagePrompts(language);
-    return buildSystemPrompt({ instruction, severityLevel });
+    return buildSystemPrompt({ instruction });
   }
 
   private buildUserPrompt(document: Document): string {

@@ -13,7 +13,6 @@ export const reviewIssueSchema = z.object({
 
 export const reviewResponseSchema = z.object({
   issues: z.array(reviewIssueSchema),
-  summary: z.string(),
 });
 
 export type ReviewIssueSchema = z.infer<typeof reviewIssueSchema>;

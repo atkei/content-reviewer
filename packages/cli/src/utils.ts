@@ -8,12 +8,6 @@ export function formatReviewResult(result: ReviewResult): string {
 
 `;
 
-  output += `${pc.bold('Summary:')}
-`;
-  output += `${result.summary}
-
-`;
-
   if (result.issues.length === 0) {
     output += `${pc.green('✓ No issues found!')}
 `;

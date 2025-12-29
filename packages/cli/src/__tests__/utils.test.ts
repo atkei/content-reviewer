@@ -6,7 +6,6 @@ describe('formatReviewResultJSON', () => {
   it('should format review result as JSON', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Test summary',
       issues: [],
       reviewedAt: new Date('2024-01-01T00:00:00.000Z'),
     };
@@ -15,14 +14,12 @@ describe('formatReviewResultJSON', () => {
     const parsed = JSON.parse(json);
 
     expect(parsed.source).toBe('test.md');
-    expect(parsed.summary).toBe('Test summary');
     expect(json).toContain('"source": "test.md"');
   });
 
   it('should handle result with issues', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Test summary',
       issues: [
         {
           severity: 'warning',
@@ -46,7 +43,6 @@ describe('formatReviewResult', () => {
   it('should format review result with no issues', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Great content!',
       issues: [],
       reviewedAt: new Date('2024-01-01T00:00:00.000Z'),
     };
@@ -54,14 +50,12 @@ describe('formatReviewResult', () => {
     const formatted = formatReviewResult(result);
 
     expect(formatted).toContain('test.md');
-    expect(formatted).toContain('Great content!');
     expect(formatted).toContain('No issues found!');
   });
 
   it('should format review result with issues', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Some issues found',
       issues: [
         {
           severity: 'warning',
@@ -81,7 +75,6 @@ describe('formatReviewResult', () => {
     const formatted = formatReviewResult(result);
 
     expect(formatted).toContain('test.md');
-    expect(formatted).toContain('Some issues found');
     expect(formatted).toContain('Issues (2)');
     expect(formatted).toContain('Consider improving this');
     expect(formatted).toContain('Accuracy issue');
@@ -93,7 +86,6 @@ describe('formatReviewResult', () => {
   it('should handle different severity levels', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Multiple severity levels',
       issues: [
         {
           severity: 'error',
@@ -121,7 +113,6 @@ describe('formatReviewResult', () => {
   it('should format issue without line number', () => {
     const result: ReviewResult = {
       source: 'test.md',
-      summary: 'Issue without line',
       issues: [
         {
           severity: 'suggestion',
