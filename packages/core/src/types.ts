@@ -1,4 +1,7 @@
 import type { ReviewResponseSchema } from './schemas.js';
+import type { IssueSeverity } from './severity.js';
+
+export type { IssueSeverity };
 
 export type Document = Readonly<{
   rawContent: string;
@@ -25,8 +28,6 @@ export type ReviewConfig = Readonly<{
   llm: LLMConfig;
   severityLevel?: IssueSeverity;
 }>;
-
-export type IssueSeverity = 'error' | 'warning' | 'suggestion';
 
 export type ReviewIssue = Readonly<{
   severity: IssueSeverity;

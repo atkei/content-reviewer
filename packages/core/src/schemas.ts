@@ -1,7 +1,10 @@
 import { z } from 'zod';
+import { SEVERITY_LEVELS, type IssueSeverity } from './severity.js';
+
+const severityKeys = Object.keys(SEVERITY_LEVELS) as [IssueSeverity, ...IssueSeverity[]];
 
 export const reviewIssueSchema = z.object({
-  severity: z.enum(['error', 'warning', 'suggestion']),
+  severity: z.enum(severityKeys),
   message: z.string(),
   matchText: z.string().optional(),
   lineNumber: z.number().optional(),

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { filterIssuesBySeverity, SEVERITY_LEVELS } from '../filter.js';
+import { filterIssuesBySeverity } from '../filter.js';
+import { SEVERITY_LEVELS } from '../severity.js';
 import type { ReviewIssue } from '../types.js';
 
 describe('filter', () => {
