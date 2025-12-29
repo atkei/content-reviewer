@@ -1,5 +1,15 @@
 # @content-reviewer/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- 32b52dc: Remove summary field from ReviewResult
+- 4ee6eaa: Change default severity level from "suggestion" to "warning"
+- Updated dependencies [32b52dc]
+- Updated dependencies [4ee6eaa]
+  - @content-reviewer/core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

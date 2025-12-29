@@ -1,5 +1,12 @@
 # @content-reviewer/core
 
+## 0.0.5
+
+### Patch Changes
+
+- 32b52dc: Remove summary field from ReviewResult
+- 4ee6eaa: Change default severity level from "suggestion" to "warning"
+
 ## 0.0.4
 
 ### Patch Changes
