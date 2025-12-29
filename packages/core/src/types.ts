@@ -40,6 +40,5 @@ export type ReviewIssue = Readonly<{
 export type ReviewResult = Readonly<{
   source: string;
   issues: ReviewIssue[];
-  summary: string;
   reviewedAt: Date;
 }>;
