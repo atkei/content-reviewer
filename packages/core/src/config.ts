@@ -1,7 +1,7 @@
 import type { ReviewConfig, Language, LLMConfig, LLMProvider, IssueSeverity } from './types.js';
 import { ENV_VARS } from './constants.js';
 import { MissingApiKeyError } from './errors.js';
-import { SEVERITY_LEVELS } from './filter.js';
+import { SEVERITY_LEVELS } from './severity.js';
 
 export type ReviewConfigInput = Readonly<{
   instruction?: string;

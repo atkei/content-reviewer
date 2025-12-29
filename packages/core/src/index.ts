@@ -42,4 +42,6 @@ export {
 
 export { ENV_VARS } from './constants.js';
 
-export { filterIssuesBySeverity, SEVERITY_LEVELS, DEFAULT_SEVERITY_LEVEL } from './filter.js';
+export { filterIssuesBySeverity } from './filter.js';
+
+export { SEVERITY_LEVELS, DEFAULT_SEVERITY_LEVEL } from './severity.js';

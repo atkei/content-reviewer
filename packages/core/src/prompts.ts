@@ -1,6 +1,6 @@
 import type { IssueSeverity, Language } from './types.js';
 import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from './default-instructions.js';
-import { SEVERITY_LEVELS } from './filter.js';
+import { SEVERITY_LEVELS } from './severity.js';
 
 export type SystemPromptOptions = Readonly<{
   instruction?: string;
