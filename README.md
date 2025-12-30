@@ -1,11 +1,11 @@
 # Content Reviewer
 
-An LLM-powered tool for reviewing written content. By default, it’s optimized for technical writing (e.g., blog posts, docs, guides), and you can customize it with instructions for any style or domain.
+An LLM-powered tool for reviewing written content. It comes with sensible defaults for technical writing (e.g., blog posts, docs, guides), and you can customize the review criteria to match your own standards.
 
 ## Features
 
-- Sensible defaults out of the box
-- Custom instructions for consistent, team-specific review criteria
+- Sensible defaults out of the box for technical writing
+- Customizable review criteria via instruction files
 - Structured output with severity levels (error, warning, suggestion)
 - Multiple LLM providers (OpenAI, Anthropic, Google)
 
@@ -43,21 +43,50 @@ const result = await reviewer.review({
 
 See [Core Documentation](./packages/core) for API reference.
 
+## Custom Instructions
+
+You can provide your own review criteria via an instruction file. This **replaces** the default instructions, so include everything you want checked.
+
+```bash
+content-review article.md --instruction my-standards.md
+```
+
+### Example
+
+```markdown
+## error
+
+- ...
+- Product name must be "MyProduct" (not "myproduct")
+- Code blocks must specify language
+
+## warning
+
+- ...
+- Avoid "latest version" - use exact version numbers
+
+## ignore (do NOT report)
+
+- Passive voice
+- Paragraph length
+- Minor wording suggestions
+```
+
 ## Packages
 
-| Package                                   | Description                               | Version                                                                                                             |
-| ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [@content-reviewer/cli](./packages/cli)   | Command-line interface for content review | [![npm](https://img.shields.io/npm/v/@content-reviewer/cli)](https://www.npmjs.com/package/@content-reviewer/cli)   |
-| [@content-reviewer/core](./packages/core) | Core library for programmatic integration | [![npm](https://img.shields.io/npm/v/@content-reviewer/core)](https://www.npmjs.com/package/@content-reviewer/core) |
+| Package                                   | Description                       | Version                                                                                                             |
+| ----------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [@content-reviewer/cli](./packages/cli)   | Command-line interface            | [![npm](https://img.shields.io/npm/v/@content-reviewer/cli)](https://www.npmjs.com/package/@content-reviewer/cli)   |
+| [@content-reviewer/core](./packages/core) | Core library for programmatic use | [![npm](https://img.shields.io/npm/v/@content-reviewer/core)](https://www.npmjs.com/package/@content-reviewer/core) |
 
 ## GitHub Actions
 
-Review docs in Pull Requests with [Content Reviewer Action](https://github.com/atkei/content-reviewer-action).
+Automate reviews in Pull Requests with [Content Reviewer Action](https://github.com/atkei/content-reviewer-action).
 
 ## Prerequisites
 
 - Node.js >= 20.0.0
-- API key for a supported LLM provider (OpenAI, Anthropic, or Google)
+- API key for OpenAI, Anthropic, or Google
 
 ## Development
 
