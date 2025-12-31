@@ -1,5 +1,13 @@
 # @content-reviewer/cli
 
+## 0.0.6
+
+### Patch Changes
+
+- 32a9e21: Improve default instructions with tech blog specific checks and update documentation
+- Updated dependencies [32a9e21]
+  - @content-reviewer/core@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
