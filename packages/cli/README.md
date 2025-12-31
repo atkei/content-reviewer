@@ -81,31 +81,18 @@ Create a `.reviewrc.json` file in your project root:
 }
 ```
 
-### Custom Instruction (Persona & Guidelines)
+### Custom Instructions
 
-You can provide an instruction file (e.g., Markdown) to define the reviewer's persona and guidelines:
+You can provide a custom instruction file to define your own review criteria:
 
 ```bash
-content-review article.md --instruction ./my-instruction.md
+content-review article.md --instruction my-standards.md
 ```
 
 Or via config file:
 
 ```json
 {
-  "instructionFile": "./my-instruction.md",
-  "language": "en"
+  "instructionFile": "./my-standards.md"
 }
-```
-
-Example instruction file:
-
-```markdown
-You are a strict technical editor.
-Please review the provided text for technical accuracy and clarity.
-
-# Review Guidelines
-
-- Ensure all code examples are correct.
-- Check for passive voice usage.
 ```
