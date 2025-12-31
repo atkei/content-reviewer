@@ -1,6 +1,6 @@
 {
   "name": "@content-reviewer/core",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Library for reviewing written content using LLMs",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
