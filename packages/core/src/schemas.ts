@@ -9,6 +9,12 @@ export const reviewIssueSchema = z.object({
   matchText: z.string().optional(),
   lineNumber: z.number().optional(),
   suggestion: z.string().optional(),
+  source: z
+    .object({
+      url: z.string().url(),
+      title: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const reviewResponseSchema = z.object({

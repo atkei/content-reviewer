@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AISdkClient } from '../../llm/ai-sdk-client.js';
 import { LLMError, UnsupportedProviderError } from '../../errors.js';
+import { DEFAULT_FACT_CHECK_CONFIG } from '../../config.js';
 import type { LLMConfig } from '../../types.js';
 
 // Mock the ai-sdk functions
@@ -43,7 +44,7 @@ describe('AISdkClient', () => {
 
   it('should throw UnsupportedProviderError for unknown provider', async () => {
     const badConfig = { ...mockConfig, provider: 'unknown-provider' as any };
-    const client = new AISdkClient(badConfig, 'key');
+    const client = new AISdkClient(badConfig, 'key', DEFAULT_FACT_CHECK_CONFIG);
 
     await expect(client.generateReview('sys', 'user')).rejects.toThrow(UnsupportedProviderError);
   });
@@ -52,7 +53,7 @@ describe('AISdkClient', () => {
     const error = new Error('API Error');
     mockGenerateObject.mockRejectedValue(error);
 
-    const client = new AISdkClient(mockConfig, 'key');
+    const client = new AISdkClient(mockConfig, 'key', DEFAULT_FACT_CHECK_CONFIG);
 
     await expect(client.generateReview('sys', 'user')).rejects.toThrow(LLMError);
     await expect(client.generateReview('sys', 'user')).rejects.toThrow(
@@ -63,7 +64,7 @@ describe('AISdkClient', () => {
   it('should wrap unknown errors in LLMError', async () => {
     mockGenerateObject.mockRejectedValue('Unknown string error');
 
-    const client = new AISdkClient(mockConfig, 'key');
+    const client = new AISdkClient(mockConfig, 'key', DEFAULT_FACT_CHECK_CONFIG);
 
     await expect(client.generateReview('sys', 'user')).rejects.toThrow(LLMError);
     await expect(client.generateReview('sys', 'user')).rejects.toThrow(

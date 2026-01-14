@@ -50,6 +50,14 @@ function formatIssue(issue: ReviewIssue, index: number): string {
 `;
   }
 
+  if (issue.source) {
+    const sourceText = issue.source.title
+      ? `${issue.source.title} (${issue.source.url})`
+      : issue.source.url;
+    output += `   ${pc.blue('🔗 Source:')} ${sourceText}
+`;
+  }
+
   output += '\n';
 
   return output;

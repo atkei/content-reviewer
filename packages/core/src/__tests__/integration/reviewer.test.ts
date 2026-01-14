@@ -27,6 +27,7 @@ describe('ContentReviewer (Integration)', () => {
     const config: ReviewConfig = {
       language: 'ja',
       llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      factCheck: { enabled: false },
     };
 
     const reviewer = new ContentReviewer(config);
@@ -44,6 +45,7 @@ describe('ContentReviewer (Integration)', () => {
     const config: ReviewConfig = {
       language: 'ja',
       llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      factCheck: { enabled: false },
     };
 
     const reviewer = new ContentReviewer(config);
