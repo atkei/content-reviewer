@@ -6,7 +6,7 @@ export const factCheckClaimSchema = z.object({
 });
 
 export const factCheckPlanSchema = z.object({
-  claims: z.array(factCheckClaimSchema).max(20),
+  claims: z.array(factCheckClaimSchema),
 });
 
 export type FactCheckClaim = z.infer<typeof factCheckClaimSchema>;

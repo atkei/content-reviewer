@@ -30,13 +30,15 @@ export class ContentReviewer {
     const apiKey = resolveApiKey(this.config);
     const llmClient = createLLMClient(this.config.llm, apiKey, this.config.factCheck);
 
-    const systemPrompt = this.buildSystemPrompt(reviewedAt);
+    const asOf = reviewedAt.toISOString().slice(0, 10);
+    const systemPrompt = this.buildSystemPrompt(asOf);
     const userPrompt = this.buildUserPrompt(document);
-    const factCheckInstruction = this.buildFactCheckInstruction(reviewedAt);
+    const factCheckInstruction = this.buildFactCheckInstruction(asOf);
     const reviewData = await llmClient.generateReview(
       systemPrompt,
       userPrompt,
-      factCheckInstruction
+      factCheckInstruction,
+      asOf
     );
 
     const issues = reviewData.issues.map((issue) => ({
@@ -49,9 +51,8 @@ export class ContentReviewer {
     return { issues };
   }
 
-  private buildSystemPrompt(reviewedAt: Date): string {
+  private buildSystemPrompt(asOf: string): string {
     const { instruction, language } = this.config;
-    const asOf = reviewedAt.toISOString().slice(0, 10);
 
     const { buildSystemPrompt } = getLanguagePrompts(language);
     return buildSystemPrompt({
@@ -70,13 +71,12 @@ export class ContentReviewer {
     return prompt + document.rawContent;
   }
 
-  private buildFactCheckInstruction(reviewedAt: Date): string | undefined {
+  private buildFactCheckInstruction(asOf: string): string | undefined {
     if (!this.config.factCheck.enabled) {
       return undefined;
     }
 
     const { language, factCheck } = this.config;
-    const asOf = reviewedAt.toISOString().slice(0, 10);
 
     // Use custom instruction if provided, otherwise use default
     const baseInstruction = factCheck.instruction

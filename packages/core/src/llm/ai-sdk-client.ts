@@ -21,7 +21,8 @@ export class AISdkClient implements LLMClient {
   async generateReview(
     systemPrompt: string,
     userPrompt: string,
-    factCheckInstruction?: string
+    factCheckInstruction?: string,
+    asOf?: string
   ): Promise<LLMResponse> {
     try {
       const providerAdapter = getProviderAdapter(this.config.provider);
@@ -37,7 +38,8 @@ export class AISdkClient implements LLMClient {
           tools,
           systemPrompt,
           userPrompt,
-          factCheckInstruction
+          factCheckInstruction,
+          asOf
         );
       }
 
@@ -75,24 +77,34 @@ export class AISdkClient implements LLMClient {
     tools: ToolSet | undefined,
     reviewSystemPrompt: string,
     userPrompt: string,
-    factCheckInstruction: string
+    factCheckInstruction: string,
+    asOf?: string
   ): Promise<LLMResponse> {
     if (!tools) {
       return await this.generateWithoutTools(model, reviewSystemPrompt, userPrompt);
     }
 
-    const asOf = this.getAsOfDate();
+    const referenceDate = asOf ?? this.getAsOfDate();
     const claims = await generateFactCheckPlan(model, userPrompt, factCheckInstruction);
 
     if (claims.length === 0) {
       return await this.generateWithoutTools(model, reviewSystemPrompt, userPrompt);
     }
 
-    const { system, prompt } = buildFactCheckPrompt(factCheckInstruction, claims, userPrompt, asOf);
+    const { system, prompt } = buildFactCheckPrompt(
+      factCheckInstruction,
+      claims,
+      userPrompt,
+      referenceDate
+    );
 
     const factCheckResult = await runFactCheck(model, tools, system, prompt);
 
-    const enrichedPrompt = buildReviewPromptWithFactCheck(userPrompt, factCheckResult, asOf);
+    const enrichedPrompt = buildReviewPromptWithFactCheck(
+      userPrompt,
+      factCheckResult,
+      referenceDate
+    );
     const { object } = await generateObject({
       model,
       schema: reviewResponseSchema,

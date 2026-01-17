@@ -36,7 +36,8 @@ export interface LLMClient {
   generateReview(
     systemPrompt: string,
     userPrompt: string,
-    factCheckInstruction?: string
+    factCheckInstruction?: string,
+    asOf?: string
   ): Promise<LLMResponse>;
 }
 
