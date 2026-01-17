@@ -1,7 +1,7 @@
 import { generateObject } from 'ai';
-import { factCheckPlanSchema, type FactCheckClaim } from '../fact-check.js';
-import { buildFactCheckPlanPrompt } from './prompts/fact-check-prompts.js';
-import type { AISdkModel } from './providers/types.js';
+import { factCheckPlanSchema, type FactCheckClaim } from './schema.js';
+import { buildFactCheckPlanPrompt } from './prompts.js';
+import type { AISdkModel } from '../llm/providers/types.js';
 
 export async function generateFactCheckPlan(
   model: AISdkModel,

@@ -37,3 +37,10 @@ export class MissingFactCheckInstructionError extends ContentReviewerError {
     this.name = 'MissingFactCheckInstructionError';
   }
 }
+
+export class MissingFactCheckToolsError extends ContentReviewerError {
+  constructor() {
+    super('Fact-check tools are unavailable for the selected provider.');
+    this.name = 'MissingFactCheckToolsError';
+  }
+}

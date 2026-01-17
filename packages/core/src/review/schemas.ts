@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SEVERITY_LEVELS, type IssueSeverity } from './severity.js';
+import { SEVERITY_LEVELS, type IssueSeverity } from '../severity.js';
 
 const severityKeys = Object.keys(SEVERITY_LEVELS) as [IssueSeverity, ...IssueSeverity[]];
 

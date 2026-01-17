@@ -13,11 +13,17 @@ export type {
 } from './types.js';
 
 export {
+  factCheckClaimSchema,
+  factCheckPlanSchema,
+  type FactCheckClaim,
+} from './fact-check/schema.js';
+
+export {
   reviewIssueSchema,
   reviewResponseSchema,
   type ReviewIssueSchema,
   type ReviewResponseSchema,
-} from './schemas.js';
+} from './review/schemas.js';
 
 export type { ReviewConfigInput } from './config.js';
 export {
@@ -32,7 +38,7 @@ export {
 
 export { createLLMClient, AISdkClient } from './llm/index.js';
 
-export { ContentReviewer } from './reviewer.js';
+export { ContentReviewer } from './review/reviewer.js';
 
 export {
   DEFAULT_INSTRUCTION_JA,
@@ -47,6 +53,7 @@ export {
   UnsupportedProviderError,
   MissingApiKeyError,
   MissingFactCheckInstructionError,
+  MissingFactCheckToolsError,
 } from './errors.js';
 
 export { ENV_VARS } from './constants.js';

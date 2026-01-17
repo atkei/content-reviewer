@@ -12,5 +12,7 @@ export const factCheckPlanSchema = z.object({
 export type FactCheckClaim = z.infer<typeof factCheckClaimSchema>;
 
 export function formatClaimsForPrompt(claims: FactCheckClaim[]): string {
-  return claims.map((c) => `- ${c.id}: ${c.text}`).join('\n');
+  const lineBreak = `
+`;
+  return claims.map((c) => `- ${c.id}: ${c.text}`).join(lineBreak);
 }

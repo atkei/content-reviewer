@@ -1,5 +1,5 @@
 import { generateText, type ToolSet } from 'ai';
-import type { AISdkModel } from './providers/types.js';
+import type { AISdkModel } from '../llm/providers/types.js';
 
 export async function runFactCheck(
   model: AISdkModel,

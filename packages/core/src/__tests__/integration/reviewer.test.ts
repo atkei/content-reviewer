@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ContentReviewer } from '../../reviewer.js';
+import { ContentReviewer } from '../../review/reviewer.js';
 import type { Document, ReviewConfig } from '../../types.js';
 
 // Mock LLM client

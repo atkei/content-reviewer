@@ -1,4 +1,5 @@
 import type { IssueSeverity } from './severity.js';
+import type { FactCheckClaim } from './fact-check/schema.js';
 
 export type { IssueSeverity };
 
@@ -33,12 +34,13 @@ export type LLMResponse = Readonly<{
 }>;
 
 export interface LLMClient {
-  generateReview(
-    systemPrompt: string,
+  generateReview(systemPrompt: string, userPrompt: string): Promise<LLMResponse>;
+  supportsFactCheck(): boolean;
+  generateFactCheckPlan(
     userPrompt: string,
-    factCheckInstruction?: string,
-    asOf?: string
-  ): Promise<LLMResponse>;
+    factCheckInstruction: string
+  ): Promise<FactCheckClaim[]>;
+  runFactCheck(systemPrompt: string, prompt: string): Promise<string>;
 }
 
 export type ReviewConfig = Readonly<{

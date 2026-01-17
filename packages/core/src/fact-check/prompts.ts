@@ -1,4 +1,4 @@
-import { formatClaimsForPrompt, type FactCheckClaim } from '../../fact-check.js';
+import { formatClaimsForPrompt, type FactCheckClaim } from './schema.js';
 
 export function buildFactCheckPlanPrompt(factCheckInstruction: string): string {
   return `${factCheckInstruction.trim()}

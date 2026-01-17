@@ -1,12 +1,13 @@
-import type { Document, ReviewConfig, ReviewResult } from './types.js';
-import { createLLMClient } from './llm/index.js';
-import { resolveApiKey } from './config.js';
+import type { Document, ReviewConfig, ReviewResult } from '../types.js';
+import { createLLMClient } from '../llm/index.js';
+import { resolveApiKey } from '../config.js';
 import { getLanguagePrompts } from './prompts.js';
-import { filterIssuesBySeverity } from './filter.js';
+import { filterIssuesBySeverity } from '../filter.js';
 import {
   DEFAULT_FACT_CHECK_INSTRUCTION_EN,
   DEFAULT_FACT_CHECK_INSTRUCTION_JA,
-} from './default-instructions.js';
+} from '../default-instructions.js';
+import { buildFactCheckPrompt, buildReviewPromptWithFactCheck } from '../fact-check/prompts.js';
 
 export class ContentReviewer {
   constructor(private readonly config: ReviewConfig) {}
@@ -31,15 +32,30 @@ export class ContentReviewer {
     const llmClient = createLLMClient(this.config.llm, apiKey, this.config.factCheck);
 
     const asOf = reviewedAt.toISOString().slice(0, 10);
-    const systemPrompt = this.buildSystemPrompt(asOf);
     const userPrompt = this.buildUserPrompt(document);
-    const factCheckInstruction = this.buildFactCheckInstruction(asOf);
-    const reviewData = await llmClient.generateReview(
-      systemPrompt,
-      userPrompt,
-      factCheckInstruction,
-      asOf
-    );
+    let factCheckApplied = false;
+    let reviewPrompt = userPrompt;
+
+    if (this.config.factCheck.enabled) {
+      const factCheckInstruction = this.buildFactCheckInstruction(asOf);
+      if (factCheckInstruction && llmClient.supportsFactCheck()) {
+        const claims = await llmClient.generateFactCheckPlan(userPrompt, factCheckInstruction);
+        if (claims.length > 0) {
+          const { system, prompt } = buildFactCheckPrompt(
+            factCheckInstruction,
+            claims,
+            userPrompt,
+            asOf
+          );
+          const factCheckResult = await llmClient.runFactCheck(system, prompt);
+          reviewPrompt = buildReviewPromptWithFactCheck(userPrompt, factCheckResult, asOf);
+          factCheckApplied = true;
+        }
+      }
+    }
+
+    const systemPrompt = this.buildSystemPrompt(asOf, factCheckApplied);
+    const reviewData = await llmClient.generateReview(systemPrompt, reviewPrompt);
 
     const issues = reviewData.issues.map((issue) => ({
       ...issue,
@@ -51,13 +67,13 @@ export class ContentReviewer {
     return { issues };
   }
 
-  private buildSystemPrompt(asOf: string): string {
+  private buildSystemPrompt(asOf: string, factCheckApplied: boolean): string {
     const { instruction, language } = this.config;
 
     const { buildSystemPrompt } = getLanguagePrompts(language);
     return buildSystemPrompt({
       instruction,
-      factCheckEnabled: this.config.factCheck.enabled,
+      factCheckEnabled: factCheckApplied,
       asOf,
     });
   }
@@ -87,18 +103,16 @@ export class ContentReviewer {
 
     const rules =
       language === 'ja'
-        ? [
-            '追加ルール:',
-            `- 参照日時は ${asOf} です。「現在」や「最新」に言及する場合はこの日付を明記してください。`,
-            '- 本文に存在する情報を「未記載」として指摘しないでください。',
-          ]
-        : [
-            'Additional rules:',
-            `- Reference date is ${asOf}. If you mention "current" or "latest", state it as of this date.`,
-            '- Do not claim something is missing when it appears in the content.',
-          ];
+        ? `追加ルール:
+- 参照日時は ${asOf} です。「現在」や「最新」に言及する場合はこの日付を明記してください。
+- 本文に存在する情報を「未記載」として指摘しないでください。`
+        : `Additional rules:
+- Reference date is ${asOf}. If you mention "current" or "latest", state it as of this date.
+- Do not claim something is missing when it appears in the content.`;
 
-    return [baseInstruction.trimEnd(), '', rules.join('\n')].join('\n');
+    return `${baseInstruction.trimEnd()}
+
+${rules}`;
   }
 
   private findFirstMatchingLineNumber(rawContent: string, matchText: string): number | undefined {

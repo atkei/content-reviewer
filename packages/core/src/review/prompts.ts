@@ -1,5 +1,5 @@
-import type { Language } from './types.js';
-import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from './default-instructions.js';
+import type { Language } from '../types.js';
+import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from '../default-instructions.js';
 
 export type SystemPromptOptions = Readonly<{
   instruction?: string;
@@ -15,10 +15,17 @@ type LanguagePrompts = Readonly<{
 const allPrompts: Record<Language, LanguagePrompts> = {
   ja: {
     buildSystemPrompt: ({ instruction, factCheckEnabled, asOf }) => {
-      const instructions = (instruction || DEFAULT_INSTRUCTION_JA).trimEnd() + '\n';
+      const instructions = `${(instruction || DEFAULT_INSTRUCTION_JA).trimEnd()}
+`;
       const factCheckNote =
         factCheckEnabled && asOf
-          ? `\n追加ルール:\n- ファクトチェック結果で「contradicted」とされた内容のみを技術的誤りとして指摘してください。\n- ファクトチェック結果に基づく指摘には source.url を付けてください。\n- 「現在」「最新」などの表現を使う場合は ${asOf} 時点であることを明記してください。\n- 本文に存在する情報を「未記載」として指摘しないでください。\n`
+          ? `
+追加ルール:
+- ファクトチェック結果で「contradicted」とされた内容のみを技術的誤りとして指摘してください。
+- ファクトチェック結果に基づく指摘には source.url を付けてください。
+- 「現在」「最新」などの表現を使う場合は ${asOf} 時点であることを明記してください。
+- 本文に存在する情報を「未記載」として指摘しないでください。
+`
           : '';
 
       return `${instructions}
@@ -39,14 +46,24 @@ const allPrompts: Record<Language, LanguagePrompts> = {
 ${factCheckNote}
 `;
     },
-    buildUserPrompt: () => '以下のテキストをレビューしてください：\n\n\n',
+    buildUserPrompt: () => `以下のテキストをレビューしてください：
+
+
+`,
   },
   en: {
     buildSystemPrompt: ({ instruction, factCheckEnabled, asOf }) => {
-      const instructions = (instruction || DEFAULT_INSTRUCTION_EN).trimEnd() + '\n';
+      const instructions = `${(instruction || DEFAULT_INSTRUCTION_EN).trimEnd()}
+`;
       const factCheckNote =
         factCheckEnabled && asOf
-          ? `\nAdditional rules:\n- Only report factual inaccuracies if they are contradicted in the fact-check results.\n- If an issue is based on fact-check results, include source.url.\n- If you use "current" or "latest", state it as of ${asOf}.\n- Do not claim something is missing when it appears in the content.\n`
+          ? `
+Additional rules:
+- Only report factual inaccuracies if they are contradicted in the fact-check results.
+- If an issue is based on fact-check results, include source.url.
+- If you use "current" or "latest", state it as of ${asOf}.
+- Do not claim something is missing when it appears in the content.
+`
           : '';
 
       return `${instructions}
@@ -67,7 +84,10 @@ Note:
 ${factCheckNote}
 `;
     },
-    buildUserPrompt: () => 'Please review the following text:\n\n\n',
+    buildUserPrompt: () => `Please review the following text:
+
+
+`,
   },
 };
 

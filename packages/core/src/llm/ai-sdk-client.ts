@@ -1,49 +1,35 @@
-import { generateObject, type ToolSet } from 'ai';
-import type { LLMClient, LLMConfig, LLMResponse, FactCheckConfig } from '../types.js';
-import { reviewResponseSchema } from '../schemas.js';
-import { ContentReviewerError, LLMError, MissingFactCheckInstructionError } from '../errors.js';
-import { generateFactCheckPlan } from './fact-check-plan.js';
-import { runFactCheck } from './fact-check-runner.js';
-import {
-  buildFactCheckPrompt,
-  buildReviewPromptWithFactCheck,
-} from './prompts/fact-check-prompts.js';
+import { generateObject } from 'ai';
+import type { FactCheckConfig, LLMClient, LLMConfig, LLMResponse } from '../types.js';
+import type { FactCheckClaim } from '../fact-check/schema.js';
+import { reviewResponseSchema } from '../review/schemas.js';
+import { ContentReviewerError, LLMError, MissingFactCheckToolsError } from '../errors.js';
+import { generateFactCheckPlan } from '../fact-check/plan.js';
+import { runFactCheck } from '../fact-check/run.js';
 import { getProviderAdapter } from './providers/index.js';
-import type { AISdkModel } from './providers/types.js';
+import type { AISdkModel, ProviderAdapter } from './providers/types.js';
 
 export class AISdkClient implements LLMClient {
+  private providerAdapter: ProviderAdapter | undefined;
+
   constructor(
     private readonly config: LLMConfig,
     private readonly apiKey: string,
     private readonly factCheckConfig: FactCheckConfig
   ) {}
 
-  async generateReview(
-    systemPrompt: string,
-    userPrompt: string,
-    factCheckInstruction?: string,
-    asOf?: string
-  ): Promise<LLMResponse> {
+  async generateReview(systemPrompt: string, userPrompt: string): Promise<LLMResponse> {
     try {
-      const providerAdapter = getProviderAdapter(this.config.provider);
-      const model = providerAdapter.createModel(this.apiKey, this.config.model);
+      const model = this.createModel();
+      const { object } = await generateObject({
+        model,
+        schema: reviewResponseSchema,
+        system: systemPrompt,
+        prompt: userPrompt,
+      });
 
-      if (this.factCheckConfig.enabled) {
-        if (!factCheckInstruction) {
-          throw new MissingFactCheckInstructionError();
-        }
-        const tools = providerAdapter.createTools(this.apiKey, this.factCheckConfig);
-        return await this.generateWithFactCheck(
-          model,
-          tools,
-          systemPrompt,
-          userPrompt,
-          factCheckInstruction,
-          asOf
-        );
-      }
-
-      return await this.generateWithoutTools(model, systemPrompt, userPrompt);
+      return {
+        issues: object.issues,
+      };
     } catch (error) {
       if (error instanceof ContentReviewerError) {
         throw error;
@@ -55,69 +41,61 @@ export class AISdkClient implements LLMClient {
     }
   }
 
-  private async generateWithoutTools(
-    model: AISdkModel,
-    systemPrompt: string,
-    userPrompt: string
-  ): Promise<LLMResponse> {
-    const { object } = await generateObject({
-      model,
-      schema: reviewResponseSchema,
-      system: systemPrompt,
-      prompt: userPrompt,
-    });
-
-    return {
-      issues: object.issues,
-    };
+  supportsFactCheck(): boolean {
+    return Boolean(this.createFactCheckTools());
   }
 
-  private async generateWithFactCheck(
-    model: AISdkModel,
-    tools: ToolSet | undefined,
-    reviewSystemPrompt: string,
+  async generateFactCheckPlan(
     userPrompt: string,
-    factCheckInstruction: string,
-    asOf?: string
-  ): Promise<LLMResponse> {
-    if (!tools) {
-      return await this.generateWithoutTools(model, reviewSystemPrompt, userPrompt);
+    factCheckInstruction: string
+  ): Promise<FactCheckClaim[]> {
+    try {
+      const model = this.createModel();
+      return await generateFactCheckPlan(model, userPrompt, factCheckInstruction);
+    } catch (error) {
+      if (error instanceof ContentReviewerError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new LLMError(`AI SDK request failed: ${error.message}`, error);
+      }
+      throw new LLMError('AI SDK request failed with unknown error', error);
     }
-
-    const referenceDate = asOf ?? this.getAsOfDate();
-    const claims = await generateFactCheckPlan(model, userPrompt, factCheckInstruction);
-
-    if (claims.length === 0) {
-      return await this.generateWithoutTools(model, reviewSystemPrompt, userPrompt);
-    }
-
-    const { system, prompt } = buildFactCheckPrompt(
-      factCheckInstruction,
-      claims,
-      userPrompt,
-      referenceDate
-    );
-
-    const factCheckResult = await runFactCheck(model, tools, system, prompt);
-
-    const enrichedPrompt = buildReviewPromptWithFactCheck(
-      userPrompt,
-      factCheckResult,
-      referenceDate
-    );
-    const { object } = await generateObject({
-      model,
-      schema: reviewResponseSchema,
-      system: reviewSystemPrompt,
-      prompt: enrichedPrompt,
-    });
-
-    return {
-      issues: object.issues,
-    };
   }
 
-  private getAsOfDate(): string {
-    return new Date().toISOString().slice(0, 10);
+  async runFactCheck(systemPrompt: string, prompt: string): Promise<string> {
+    try {
+      const tools = this.createFactCheckTools();
+      if (!tools) {
+        throw new MissingFactCheckToolsError();
+      }
+      const model = this.createModel();
+      return await runFactCheck(model, tools, systemPrompt, prompt);
+    } catch (error) {
+      if (error instanceof ContentReviewerError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new LLMError(`AI SDK request failed: ${error.message}`, error);
+      }
+      throw new LLMError('AI SDK request failed with unknown error', error);
+    }
+  }
+
+  private getProviderAdapter(): ProviderAdapter {
+    if (!this.providerAdapter) {
+      this.providerAdapter = getProviderAdapter(this.config.provider);
+    }
+    return this.providerAdapter;
+  }
+
+  private createModel(): AISdkModel {
+    const providerAdapter = this.getProviderAdapter();
+    return providerAdapter.createModel(this.apiKey, this.config.model);
+  }
+
+  private createFactCheckTools() {
+    const providerAdapter = this.getProviderAdapter();
+    return providerAdapter.createTools(this.apiKey, this.factCheckConfig);
   }
 }

@@ -3,7 +3,7 @@ import {
   buildFactCheckPlanPrompt,
   buildFactCheckPrompt,
   buildReviewPromptWithFactCheck,
-} from '../../llm/prompts/fact-check-prompts.js';
+} from '../../fact-check/prompts.js';
 
 describe('fact-check-prompts', () => {
   it('buildFactCheckPlanPrompt should include JSON output guidance', () => {
