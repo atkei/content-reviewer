@@ -65,6 +65,12 @@ content-review article.md -c .reviewrc.json
 
 # Save results to JSON file
 content-review article.md -o review-results.json
+
+# Enable fact-checking via web search
+content-review article.md --fact-check
+
+# Enable fact-checking with custom instructions
+content-review article.md --fact-check --fact-check-instruction fact-check-rules.md
 ```
 
 ## Configuration
@@ -94,5 +100,32 @@ Or via config file:
 ```json
 {
   "instructionFile": "./my-standards.md"
+}
+```
+
+### Fact-Checking
+
+> **Note:** Fact-checking increases API costs (approximately 3x LLM calls plus web search) and processing time.
+
+Enable fact-checking to verify claims in your content using web search:
+
+```bash
+content-review article.md --fact-check
+```
+
+You can provide custom fact-checking instructions:
+
+```bash
+content-review article.md --fact-check --fact-check-instruction fact-check-rules.md
+```
+
+Or via config file:
+
+```json
+{
+  "factCheck": {
+    "enabled": true,
+    "instructionFile": "./fact-check-rules.md"
+  }
 }
 ```

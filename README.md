@@ -8,6 +8,7 @@ An LLM-powered tool for reviewing written content. It comes with sensible defaul
 - Customizable review criteria via instruction files
 - Structured output with severity levels (error, warning, suggestion)
 - Multiple LLM providers (OpenAI, Anthropic, Google)
+- Fact-checking via web search to verify claims in content
 
 ## Quick Start
 
