@@ -1,5 +1,11 @@
 # @content-reviewer/core
 
+## 0.1.0
+
+### Minor Changes
+
+- 0a4013b: Add support for fact-checking
+
 ## 0.0.6
 
 ### Patch Changes
