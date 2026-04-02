@@ -1,6 +1,9 @@
-import type { ReviewConfigInput } from '@content-reviewer/core';
+import type { ReviewConfigInput, FactCheckConfig } from '@content-reviewer/core';
 
-export type UserConfigFile = ReviewConfigInput &
+export type UserConfigFile = Omit<ReviewConfigInput, 'factCheck'> &
   Readonly<{
     instructionFile?: string;
+    factCheck?: Partial<FactCheckConfig> & {
+      instructionFile?: string;
+    };
   }>;

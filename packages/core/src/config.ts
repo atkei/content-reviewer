@@ -1,4 +1,11 @@
-import type { ReviewConfig, Language, LLMConfig, LLMProvider, IssueSeverity } from './types.js';
+import type {
+  ReviewConfig,
+  Language,
+  LLMConfig,
+  LLMProvider,
+  IssueSeverity,
+  FactCheckConfig,
+} from './types.js';
 import { ENV_VARS } from './constants.js';
 import { MissingApiKeyError } from './errors.js';
 import { SEVERITY_LEVELS } from './severity.js';
@@ -8,6 +15,7 @@ export type ReviewConfigInput = Readonly<{
   language?: Language;
   llm?: Partial<LLMConfig>;
   severityLevel?: IssueSeverity;
+  factCheck?: Partial<FactCheckConfig>;
 }>;
 
 export const PROVIDER_DEFAULT_MODELS: Record<LLMProvider, string> = {
@@ -21,24 +29,42 @@ export const DEFAULT_LLM_CONFIG: LLMConfig = {
   model: PROVIDER_DEFAULT_MODELS.openai,
 };
 
+export const DEFAULT_FACT_CHECK_CONFIG: FactCheckConfig = {
+  enabled: false,
+};
+
 export const DEFAULT_CONFIG: ReviewConfig = {
   language: 'en',
   llm: DEFAULT_LLM_CONFIG,
+  factCheck: DEFAULT_FACT_CHECK_CONFIG,
 };
 
 export function createReviewConfig(input: ReviewConfigInput = {}): ReviewConfig {
   const provider = input.llm?.provider ?? DEFAULT_LLM_CONFIG.provider;
   const model = input.llm?.model ?? PROVIDER_DEFAULT_MODELS[provider];
+  const language = input.language ?? DEFAULT_CONFIG.language;
+  const factCheckEnabled = Boolean(input.factCheck?.enabled);
+  const factCheckUserLocation =
+    factCheckEnabled && language === 'ja'
+      ? (input.factCheck?.userLocation ?? { country: 'JP' })
+      : input.factCheck?.userLocation;
 
   return {
     instruction: input.instruction,
-    language: input.language ?? DEFAULT_CONFIG.language,
+    language,
     llm: {
       provider,
       model,
       apiKey: input.llm?.apiKey,
     },
     severityLevel: input.severityLevel,
+    factCheck: factCheckEnabled
+      ? {
+          enabled: true,
+          userLocation: factCheckUserLocation,
+          instruction: input.factCheck?.instruction,
+        }
+      : DEFAULT_FACT_CHECK_CONFIG,
   };
 }
 

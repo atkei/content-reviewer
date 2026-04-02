@@ -64,6 +64,15 @@ export const CLI_OPTIONS = {
     description: 'display configuration and instructions without running review',
     defaultValue: false,
   },
+  FACT_CHECK: {
+    flag: '--fact-check',
+    description: 'enable fact-checking via web search',
+    defaultValue: false,
+  },
+  FACT_CHECK_INSTRUCTION: {
+    flag: '--fact-check-instruction <path>',
+    description: 'path to fact-check instruction file',
+  },
 } as const;
 
 export function getOptionDescription(option: CliOptionDefinition): string {

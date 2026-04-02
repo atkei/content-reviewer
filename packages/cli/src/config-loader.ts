@@ -70,8 +70,35 @@ export async function loadConfiguration(
     }
   }
 
+  let factCheckInstructionContent: string | undefined;
+
+  if (options.factCheckInstruction && typeof options.factCheckInstruction === 'string') {
+    try {
+      const factCheckInstructionPath = resolve(process.cwd(), options.factCheckInstruction);
+      factCheckInstructionContent = await readFile(factCheckInstructionPath, 'utf-8');
+      consola.success(`Loaded fact-check instruction from: ${factCheckInstructionPath}`);
+    } catch (error) {
+      consola.warn(
+        `Failed to load fact-check instruction file: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  } else if (fileConfig.factCheck?.instructionFile) {
+    try {
+      const factCheckInstructionPath = resolve(configDir, fileConfig.factCheck.instructionFile);
+      factCheckInstructionContent = await readFile(factCheckInstructionPath, 'utf-8');
+      consola.success(`Loaded fact-check instruction from: ${factCheckInstructionPath}`);
+    } catch (error) {
+      consola.warn(
+        `Failed to load fact-check instruction file from config: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
   const severityLevel =
     (options.severityLevel as IssueSeverity | undefined) ?? fileConfig.severityLevel;
+
+  const factCheckEnabled =
+    (options.factCheck as boolean | undefined) ?? fileConfig.factCheck?.enabled;
 
   const config = createReviewConfig({
     ...fileConfig,
@@ -84,6 +111,13 @@ export async function loadConfiguration(
       model: (options.model as string | undefined) ?? fileConfig.llm?.model,
     },
     severityLevel,
+    factCheck: factCheckEnabled
+      ? {
+          ...fileConfig.factCheck,
+          enabled: true,
+          instruction: factCheckInstructionContent ?? fileConfig.factCheck?.instruction,
+        }
+      : undefined,
   });
 
   validateConfig(config);

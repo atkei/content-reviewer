@@ -1,21 +1,25 @@
 import { generateObject } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-import { createAnthropic } from '@ai-sdk/anthropic';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import type { LLMClient, LLMConfig } from '../types.js';
-import { reviewResponseSchema, type ReviewResponseSchema } from '../schemas.js';
-import { ContentReviewerError, LLMError, UnsupportedProviderError } from '../errors.js';
+import type { FactCheckConfig, LLMClient, LLMConfig, LLMResponse } from '../types.js';
+import type { FactCheckClaim } from '../fact-check/schema.js';
+import { reviewResponseSchema } from '../review/schemas.js';
+import { ContentReviewerError, LLMError, MissingFactCheckToolsError } from '../errors.js';
+import { generateFactCheckPlan } from '../fact-check/plan.js';
+import { runFactCheck } from '../fact-check/run.js';
+import { getProviderAdapter } from './providers/index.js';
+import type { AISdkModel, ProviderAdapter } from './providers/types.js';
 
 export class AISdkClient implements LLMClient {
+  private providerAdapter: ProviderAdapter | undefined;
+
   constructor(
     private readonly config: LLMConfig,
-    private readonly apiKey: string
+    private readonly apiKey: string,
+    private readonly factCheckConfig: FactCheckConfig
   ) {}
 
-  async generateReview(systemPrompt: string, userPrompt: string): Promise<ReviewResponseSchema> {
+  async generateReview(systemPrompt: string, userPrompt: string): Promise<LLMResponse> {
     try {
       const model = this.createModel();
-
       const { object } = await generateObject({
         model,
         schema: reviewResponseSchema,
@@ -23,7 +27,9 @@ export class AISdkClient implements LLMClient {
         prompt: userPrompt,
       });
 
-      return object;
+      return {
+        issues: object.issues,
+      };
     } catch (error) {
       if (error instanceof ContentReviewerError) {
         throw error;
@@ -35,30 +41,61 @@ export class AISdkClient implements LLMClient {
     }
   }
 
-  private createModel() {
-    const { provider, model } = this.config;
+  supportsFactCheck(): boolean {
+    return Boolean(this.createFactCheckTools());
+  }
 
-    switch (provider) {
-      case 'openai': {
-        const openai = createOpenAI({
-          apiKey: this.apiKey,
-        });
-        return openai(model);
+  async generateFactCheckPlan(
+    userPrompt: string,
+    factCheckInstruction: string
+  ): Promise<FactCheckClaim[]> {
+    try {
+      const model = this.createModel();
+      return await generateFactCheckPlan(model, userPrompt, factCheckInstruction);
+    } catch (error) {
+      if (error instanceof ContentReviewerError) {
+        throw error;
       }
-      case 'anthropic': {
-        const anthropic = createAnthropic({
-          apiKey: this.apiKey,
-        });
-        return anthropic(model);
+      if (error instanceof Error) {
+        throw new LLMError(`AI SDK request failed: ${error.message}`, error);
       }
-      case 'google': {
-        const google = createGoogleGenerativeAI({
-          apiKey: this.apiKey,
-        });
-        return google(model);
-      }
-      default:
-        throw new UnsupportedProviderError(provider as string);
+      throw new LLMError('AI SDK request failed with unknown error', error);
     }
+  }
+
+  async runFactCheck(systemPrompt: string, prompt: string): Promise<string> {
+    try {
+      const tools = this.createFactCheckTools();
+      if (!tools) {
+        throw new MissingFactCheckToolsError();
+      }
+      const model = this.createModel();
+      return await runFactCheck(model, tools, systemPrompt, prompt);
+    } catch (error) {
+      if (error instanceof ContentReviewerError) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new LLMError(`AI SDK request failed: ${error.message}`, error);
+      }
+      throw new LLMError('AI SDK request failed with unknown error', error);
+    }
+  }
+
+  private getProviderAdapter(): ProviderAdapter {
+    if (!this.providerAdapter) {
+      this.providerAdapter = getProviderAdapter(this.config.provider);
+    }
+    return this.providerAdapter;
+  }
+
+  private createModel(): AISdkModel {
+    const providerAdapter = this.getProviderAdapter();
+    return providerAdapter.createModel(this.apiKey, this.config.model);
+  }
+
+  private createFactCheckTools() {
+    const providerAdapter = this.getProviderAdapter();
+    return providerAdapter.createTools(this.apiKey, this.factCheckConfig);
   }
 }

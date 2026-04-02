@@ -5,6 +5,8 @@ import {
   resolveApiKey,
   DEFAULT_INSTRUCTION_EN,
   DEFAULT_INSTRUCTION_JA,
+  DEFAULT_FACT_CHECK_INSTRUCTION_EN,
+  DEFAULT_FACT_CHECK_INSTRUCTION_JA,
 } from '@content-reviewer/core';
 import { consola } from 'consola';
 import { loadConfiguration } from '../config-loader.js';
@@ -25,7 +27,8 @@ export async function handleReviewAction(
       consola.log(`Target File: ${filePath}`);
       consola.log(`Model: ${config.llm.model} (${config.llm.provider})`);
       consola.log(`Language: ${config.language}`);
-      consola.log('\n[Applied Instructions]');
+      consola.log(`Fact Check: ${config.factCheck.enabled ? 'enabled' : 'disabled'}`);
+      consola.log('\n[Review Instructions]');
 
       if (config.instruction) {
         consola.log(config.instruction);
@@ -34,6 +37,22 @@ export async function handleReviewAction(
           config.language === 'ja' ? DEFAULT_INSTRUCTION_JA : DEFAULT_INSTRUCTION_EN;
         consola.log(defaultInstruction);
         consola.log('\n(Note: These are the default instructions for the selected language)');
+      }
+
+      if (config.factCheck.enabled) {
+        consola.log('\n[Fact Check Instructions]');
+        if (config.factCheck.instruction) {
+          consola.log(config.factCheck.instruction);
+        } else {
+          const defaultFactCheckInstruction =
+            config.language === 'ja'
+              ? DEFAULT_FACT_CHECK_INSTRUCTION_JA
+              : DEFAULT_FACT_CHECK_INSTRUCTION_EN;
+          consola.log(defaultFactCheckInstruction);
+          consola.log(
+            '\n(Note: These are the default fact-check instructions for the selected language)'
+          );
+        }
       }
 
       consola.info('End of Preview');

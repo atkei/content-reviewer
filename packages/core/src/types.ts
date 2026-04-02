@@ -1,5 +1,5 @@
-import type { ReviewResponseSchema } from './schemas.js';
 import type { IssueSeverity } from './severity.js';
+import type { FactCheckClaim } from './fact-check/schema.js';
 
 export type { IssueSeverity };
 
@@ -18,8 +18,29 @@ export type LLMConfig = Readonly<{
   apiKey?: string;
 }>;
 
+export type FactCheckConfig = Readonly<{
+  enabled: boolean;
+  userLocation?: Readonly<{
+    country?: string;
+    city?: string;
+    region?: string;
+    timezone?: string;
+  }>;
+  instruction?: string;
+}>;
+
+export type LLMResponse = Readonly<{
+  issues: ReviewIssue[];
+}>;
+
 export interface LLMClient {
-  generateReview(systemPrompt: string, userPrompt: string): Promise<ReviewResponseSchema>;
+  generateReview(systemPrompt: string, userPrompt: string): Promise<LLMResponse>;
+  supportsFactCheck(): boolean;
+  generateFactCheckPlan(
+    userPrompt: string,
+    factCheckInstruction: string
+  ): Promise<FactCheckClaim[]>;
+  runFactCheck(systemPrompt: string, prompt: string): Promise<string>;
 }
 
 export type ReviewConfig = Readonly<{
@@ -27,6 +48,7 @@ export type ReviewConfig = Readonly<{
   language: Language;
   llm: LLMConfig;
   severityLevel?: IssueSeverity;
+  factCheck: FactCheckConfig;
 }>;
 
 export type ReviewIssue = Readonly<{
@@ -35,6 +57,10 @@ export type ReviewIssue = Readonly<{
   matchText?: string;
   lineNumber?: number;
   suggestion?: string;
+  source?: Readonly<{
+    url: string;
+    title?: string;
+  }>;
 }>;
 
 export type ReviewResult = Readonly<{

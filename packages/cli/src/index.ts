@@ -30,6 +30,11 @@ program
   .option(CLI_OPTIONS.API_KEY.flag, getOptionDescription(CLI_OPTIONS.API_KEY))
   .option(CLI_OPTIONS.JSON.flag, getOptionDescription(CLI_OPTIONS.JSON))
   .option(CLI_OPTIONS.DRY_RUN.flag, getOptionDescription(CLI_OPTIONS.DRY_RUN))
+  .option(CLI_OPTIONS.FACT_CHECK.flag, getOptionDescription(CLI_OPTIONS.FACT_CHECK))
+  .option(
+    CLI_OPTIONS.FACT_CHECK_INSTRUCTION.flag,
+    getOptionDescription(CLI_OPTIONS.FACT_CHECK_INSTRUCTION)
+  )
   .action(handleReviewAction);
 
 program.parse();

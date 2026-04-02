@@ -30,3 +30,17 @@ export class MissingApiKeyError extends ContentReviewerError {
     this.name = 'MissingApiKeyError';
   }
 }
+
+export class MissingFactCheckInstructionError extends ContentReviewerError {
+  constructor() {
+    super('factCheckInstruction is required when fact-checking is enabled.');
+    this.name = 'MissingFactCheckInstructionError';
+  }
+}
+
+export class MissingFactCheckToolsError extends ContentReviewerError {
+  constructor() {
+    super('Fact-check tools are unavailable for the selected provider.');
+    this.name = 'MissingFactCheckToolsError';
+  }
+}

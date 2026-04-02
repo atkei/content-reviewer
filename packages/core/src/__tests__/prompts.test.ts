@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getLanguagePrompts } from '../prompts.js';
+import { getLanguagePrompts } from '../review/prompts.js';
 import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from '../default-instructions.js';
 
 describe('prompts', () => {
@@ -12,7 +12,8 @@ describe('prompts', () => {
     });
 
     it('should use custom instruction when provided', () => {
-      const customInstruction = '# Custom Instruction\n- Check for typos.';
+      const customInstruction = `# Custom Instruction
+- Check for typos.`;
       const systemPrompt = prompts.buildSystemPrompt({
         instruction: customInstruction,
       });
@@ -31,7 +32,8 @@ describe('prompts', () => {
     });
 
     it('should use custom instruction when provided', () => {
-      const customInstruction = '# Custom Instruction\n- Check for typos.';
+      const customInstruction = `# Custom Instruction
+- Check for typos.`;
       const systemPrompt = prompts.buildSystemPrompt({
         instruction: customInstruction,
       });

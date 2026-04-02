@@ -1,8 +1,10 @@
-import type { Language } from './types.js';
-import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from './default-instructions.js';
+import type { Language } from '../types.js';
+import { DEFAULT_INSTRUCTION_EN, DEFAULT_INSTRUCTION_JA } from '../default-instructions.js';
 
 export type SystemPromptOptions = Readonly<{
   instruction?: string;
+  factCheckEnabled?: boolean;
+  asOf?: string;
 }>;
 
 type LanguagePrompts = Readonly<{
@@ -12,8 +14,19 @@ type LanguagePrompts = Readonly<{
 
 const allPrompts: Record<Language, LanguagePrompts> = {
   ja: {
-    buildSystemPrompt: ({ instruction }) => {
-      const instructions = (instruction || DEFAULT_INSTRUCTION_JA).trimEnd() + '\n';
+    buildSystemPrompt: ({ instruction, factCheckEnabled, asOf }) => {
+      const instructions = `${(instruction || DEFAULT_INSTRUCTION_JA).trimEnd()}
+`;
+      const factCheckNote =
+        factCheckEnabled && asOf
+          ? `
+追加ルール:
+- ファクトチェック結果で「contradicted」とされた内容のみを技術的誤りとして指摘してください。
+- ファクトチェック結果に基づく指摘には source.url を付けてください。
+- 「現在」「最新」などの表現を使う場合は ${asOf} 時点であることを明記してください。
+- 本文に存在する情報を「未記載」として指摘しないでください。
+`
+          : '';
 
       return `${instructions}
 レビュー結果は日本語で、以下のJSON構造で返してください：
@@ -30,13 +43,28 @@ const allPrompts: Record<Language, LanguagePrompts> = {
 - 有効なJSONのみを返してください（前後に文章やMarkdownのコードブロック等を付けないでください）。
 - lineNumberは不要です。matchTextのみを提供してください。
 - 建設的で具体的なフィードバックを提供してください。
+${factCheckNote}
 `;
     },
-    buildUserPrompt: () => '以下のテキストをレビューしてください：\n\n\n',
+    buildUserPrompt: () => `以下のテキストをレビューしてください：
+
+
+`,
   },
   en: {
-    buildSystemPrompt: ({ instruction }) => {
-      const instructions = (instruction || DEFAULT_INSTRUCTION_EN).trimEnd() + '\n';
+    buildSystemPrompt: ({ instruction, factCheckEnabled, asOf }) => {
+      const instructions = `${(instruction || DEFAULT_INSTRUCTION_EN).trimEnd()}
+`;
+      const factCheckNote =
+        factCheckEnabled && asOf
+          ? `
+Additional rules:
+- Only report factual inaccuracies if they are contradicted in the fact-check results.
+- If an issue is based on fact-check results, include source.url.
+- If you use "current" or "latest", state it as of ${asOf}.
+- Do not claim something is missing when it appears in the content.
+`
+          : '';
 
       return `${instructions}
 Provide the review results in English with the following JSON structure:
@@ -53,9 +81,13 @@ Note:
 - Return valid JSON only (do not wrap in markdown code fences or add extra text).
 - Do not provide lineNumber. Only provide matchText.
 - Provide constructive and specific feedback.
+${factCheckNote}
 `;
     },
-    buildUserPrompt: () => 'Please review the following text:\n\n\n',
+    buildUserPrompt: () => `Please review the following text:
+
+
+`,
   },
 };
 

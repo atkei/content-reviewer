@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ContentReviewer } from '../../reviewer.js';
+import { ContentReviewer } from '../../review/reviewer.js';
 import type { Document, ReviewConfig } from '../../types.js';
 
 // Mock LLM client
@@ -27,6 +27,7 @@ describe('ContentReviewer (Integration)', () => {
     const config: ReviewConfig = {
       language: 'ja',
       llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      factCheck: { enabled: false },
     };
 
     const reviewer = new ContentReviewer(config);
@@ -44,6 +45,7 @@ describe('ContentReviewer (Integration)', () => {
     const config: ReviewConfig = {
       language: 'ja',
       llm: { provider: 'openai', model: 'gpt-4o-mini', apiKey: 'test-key' },
+      factCheck: { enabled: false },
     };
 
     const reviewer = new ContentReviewer(config);
