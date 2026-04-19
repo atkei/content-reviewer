@@ -1,5 +1,16 @@
 # @content-reviewer/cli
 
+## 0.1.0
+
+### Minor Changes
+
+- 0a4013b: Add support for fact-checking
+
+### Patch Changes
+
+- Updated dependencies [0a4013b]
+  - @content-reviewer/core@0.1.0
+
 ## 0.0.6
 
 ### Patch Changes
